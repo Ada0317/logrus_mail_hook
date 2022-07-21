@@ -118,18 +118,21 @@ func (m *MailHook) Fire(entry *logrus.Entry) error {
 		return err
 	}
 	defer writeCloser.Close()
+
 	message := createMessage(entry, m.AppName)
 	if _, err = message.WriteTo(writeCloser); err != nil {
 		return err
 	}
+
 	return nil
 }
 
 func (m *MailAuthHook) Fire(entry *logrus.Entry) error {
+	// 设置身份验证信息
 	auth := smtp.PlainAuth("", m.UserName, m.PassWord, m.Host)
 
 	message := createMessage(entry, m.AppName)
-
+	// 设置 连接指定服务器 身份认证 发送方和接收方 并且进行邮件发送
 	err := smtp.SendMail(
 		m.Host+":"+strconv.Itoa(m.Port),
 		auth,
